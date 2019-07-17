@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>FB Login</title>
+    <link rel="stylesheet" href="https://bootswatch.com/4/darkly/bootstrap.min.css">
+    <style>
+        #profile{
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark">
+            <a class="navbar-brand" href="#">Social Auth</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarCollapse">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="#">Home </a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav navbar-right">
+                    <li><a class="nav-link" id="logout" href="#" onclick="logout()">Logout</a></li>
+                    <li class="nav-item active">
+                            <fb:login-button 
+                                id="fb-btn"
+                                scope="public_profile,email"
+                                onlogin="checkLoginState();">
+                            </fb:login-button>
+                    </li>
+                </ul>
+            </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h3 id="heading">Login in to view your profile</h3>
+        <div id="profile">
+            <p>Nombre:    <span id="name"></span> </p>
+            <p>Email:    <span id="email"></span> </p>
+        </div>
+
+    </div>
+    
+
+
+    
+<script>
+    window.fbAsyncInit = function() {
+      FB.init({
+        appId      : '3525644637461014',
+        cookie     : true,
+        xfbml      : true,
+        version    : 'v3.1'
+      });
+        
+        FB.getLoginStatus(function(response) {
+                statusChangeCallback(response);
+        });
+        
+    };
+  
+    (function(d, s, id){
+       var js, fjs = d.getElementsByTagName(s)[0];
+       if (d.getElementById(id)) {return;}
+       js = d.createElement(s); js.id = id;
+       js.src = "https://connect.facebook.net/en_US/sdk.js";
+       fjs.parentNode.insertBefore(js, fjs);
+     }(document, 'script', 'facebook-jssdk'));
+
+     function statusChangeCallback(response){
+         if(response.status === 'connected'){
+            console.log('Logged in and authenticated');
+            setElements(true);
+            testAPI();
+         }else{
+             console.log("Not authenticated");
+             setElements(false);
+         }
+     }
+
+     function testAPI(){
+         FB.api('/me?fields=name,email', function(response){
+             if(response && !response.error){
+                 console.log(response);
+                 document.getElementById('name').innerHTML = response.name;
+                 document.getElementById('email').innerHTML = response.email;
+             }
+         })
+     }
+
+     function checkLoginState() {
+        FB.getLoginStatus(function(response) {
+            statusChangeCallback(response);
+        });
+     }
+
+     function setElements(isLoggedIn){
+        if(isLoggedIn){
+            document.getElementById('logout').style.display = 'block';
+            document.getElementById('profile').style.display = 'block';
+            document.getElementById('fb-btn').style.display = 'none';
+            document.getElementById('heading').style.display = 'none';
+        }else{
+            document.getElementById('logout').style.display = 'none';
+            document.getElementById('profile').style.display = 'none';
+            document.getElementById('fb-btn').style.display = 'block';
+            document.getElementById('heading').style.display = 'block';
+        }
+     }
+
+     function logout(){
+         FB.logout(function(response){
+             setElements(false);
+         })
+     }
+  </script>
+
+</body>
+</html>
